@@ -1,0 +1,32 @@
+{
+  "name": "sivaschenko/magento2-media",
+  "description": "Magento 2 media analysis and cleanup",
+  "type": "magento2-module",
+  "version": "1.0.0",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Sergii Ivashchenko",
+      "homepage": "http://www.sivaschenko.com/"
+    }
+  ],
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://repo.magento.com/"
+    }
+  ],
+  "require": {
+    "php": "~5.6.5|7.0.2|7.0.4|~7.0.6",
+    "magento/module-catalog": "100.1.*",
+    "magento/framework": "100.1.*"
+  },
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "Sivaschenko\\Media\\": ""
+    }
+  }
+}

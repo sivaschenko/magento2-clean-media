@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @package     Sivaschenko\Media
+ * @author      Sergii Ivashchenko <contact@sivaschenko.com>
+ * @copyright   2017, Sergii Ivashchenko
+ * @license     MIT
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Framework\Console\CommandListInterface">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="analyzeCleanMediaCommand" xsi:type="object">Sivaschenko\Media\Command\CatalogMedia</item>
+            </argument>
+        </arguments>
+    </type>
+</config>
