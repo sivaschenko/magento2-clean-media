@@ -3,7 +3,7 @@
 /**
  * @package     Sivaschenko\Media
  * @author      Sergii Ivashchenko <contact@sivaschenko.com>
- * @copyright   2017, Sergii Ivashchenko
+ * @copyright   2017-2018, Sergii Ivashchenko
  * @license     MIT
  */
  -->
@@ -11,7 +11,7 @@
     <type name="Magento\Framework\Console\CommandListInterface">
         <arguments>
             <argument name="commands" xsi:type="array">
-                <item name="analyzeCleanMediaCommand" xsi:type="object">Sivaschenko\Media\Command\CatalogMedia</item>
+                <item name="analyzeCleanMediaCommand" xsi:type="object">Sivaschenko\CleanMedia\Command\CatalogMedia</item>
             </argument>
         </arguments>
     </type>
