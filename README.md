@@ -4,7 +4,7 @@ The module provides a command for retrieving information about catalog media and
 
 # Installation
 
-To install this module put all files of current directory to <magento_root>/app/code/Sivaschenko/IdentityToken and run the following commands from magento root:
+Run the following commands from the project root directory:
 
 ```
 composer require sivaschenko/magento2-clean-media
