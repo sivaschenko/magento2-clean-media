@@ -8,7 +8,7 @@ Run the following commands from the project root directory:
 
 ```
 composer require sivaschenko/magento2-clean-media
-bin/magento module:enable Sivaschenko_Media
+bin/magento module:enable Sivaschenko_CleanMedia
 bin/magento setup:upgrade
 ```
 
