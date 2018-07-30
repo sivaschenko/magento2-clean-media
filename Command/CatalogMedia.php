@@ -2,10 +2,10 @@
 /**
  * @package     Sivaschenko\Media
  * @author      Sergii Ivashchenko <contact@sivaschenko.com>
- * @copyright   2017, Sergii Ivashchenko
+ * @copyright   2017-2018, Sergii Ivashchenko
  * @license     MIT
  */
-namespace Sivaschenko\Media\Command;
+namespace Sivaschenko\CleanMedia\Command;
 
 use Magento\Framework\DB\Select;
 use Symfony\Component\Console\Command\Command;
