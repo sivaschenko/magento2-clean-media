@@ -2,6 +2,16 @@
 
 The module provides a command for retrieving information about catalog media and allows to remove unused images
 
+# Installation
+
+To install this module put all files of current directory to <magento_root>/app/code/Sivaschenko/IdentityToken and run the following commands from magento root:
+
+```
+composer require sivaschenko/magento2-clean-media
+bin/magento module:enable Sivaschenko_Media
+bin/magento setup:upgrade
+```
+
 # Usage
 
 ## Information about media
