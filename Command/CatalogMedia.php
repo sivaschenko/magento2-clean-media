@@ -146,7 +146,7 @@ class CatalogMedia extends Command
     {
         $connection = $this->resource->getConnection();
         $select = $connection->select()
-            ->from($connection->getTableName(Gallery::GALLERY_TABLE))
+            ->from($this->resource->getTableName(Gallery::GALLERY_TABLE))
             ->reset(Select::COLUMNS)->columns('value');
 
         return $connection->fetchCol($select);
