@@ -7,7 +7,6 @@
  */
 namespace Sivaschenko\CleanMedia\Command;
 
-use Magento\Catalog\Controller\Adminhtml\Product\Duplicate;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\DB\Select;
 use Magento\Framework\Filesystem;
@@ -20,8 +19,6 @@ use Magento\Framework\App\ResourceConnection;
 use Magento\Catalog\Model\ResourceModel\Product\Gallery;
 use Magento\Framework\Filesystem\Driver\File;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Process;
 
 class CatalogMedia extends Command
 {
@@ -31,7 +28,7 @@ class CatalogMedia extends Command
     const INPUT_KEY_REMOVE_UNUSED = 'remove_unused';
 
     /**
-     * Inpu tkey for removing orphaned media gallery rows
+     * Input key for removing orphaned media gallery rows
      */
     const INPUT_KEY_REMOVE_ORPHANED_ROWS = 'remove_orphaned_rows';
 
