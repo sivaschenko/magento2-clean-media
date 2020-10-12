@@ -21,7 +21,12 @@ class CatalogMedia extends Command
     /**
      * Input key for removing unused images
      */
-    const INPUT_KEY_REMOVE_UNUSED = 'remove_unsused';
+    const INPUT_KEY_REMOVE_UNUSED = 'remove_unused';
+
+    /**
+     * Inpu tkey for removing orphaned media gallery rows
+     */
+    const INPUT_KEY_REMOVE_ORPHANED_ROWS = 'remove_orphaned_rows';
 
     /**
      * Input key for listing missing files
@@ -67,6 +72,11 @@ class CatalogMedia extends Command
                 'r',
                 InputOption::VALUE_NONE,
                 'Remove unused product images'
+            )->addOption(
+                self::INPUT_KEY_REMOVE_ORPHANED_ROWS,
+                'o',
+                InputOption::VALUE_NONE,
+                'Remove orphaned media gallery rows'
             )->addOption(
                 self::INPUT_KEY_LIST_MISSING,
                 'm',
@@ -130,6 +140,10 @@ class CatalogMedia extends Command
         if ($input->getOption(self::INPUT_KEY_LIST_MISSING)) {
             $output->writeln('Missing media files:');
             $output->writeln(implode("\n", $missingFiles));
+        }
+
+        if ($input->getOption(self::INPUT_KEY_REMOVE_ORPHANED_ROWS)) {
+            $this->resource->getConnection()->delete($this->resource->getTableName(Gallery::GALLERY_TABLE), ['value IN (?)' => $missingFiles]);
         }
 
         $output->writeln(sprintf('Media Gallery entries: %s.', count($mediaGalleryPaths)));
