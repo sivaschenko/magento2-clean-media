@@ -24,7 +24,7 @@
       "registration.php"
     ],
     "psr-4": {
-      "Sivaschenko\\Media\\": ""
+      "Sivaschenko\\CleanMedia\\": ""
     }
   }
 }
