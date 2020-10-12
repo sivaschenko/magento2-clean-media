@@ -248,12 +248,12 @@ class CatalogMedia extends Command
      */
     private function getMediaGalleryPaths()
     {
-        $db = $this->resource->getConnection();
-        $select = $db->select()
+        $connection = $this->resource->getConnection();
+        $select = $connection->select()
             ->from($this->resource->getTableName(Gallery::GALLERY_TABLE))
             ->reset(Select::COLUMNS)->columns('value');
 
-        return $db->fetchCol($select);
+        return $connection->fetchCol($select);
     }
 
     /**
