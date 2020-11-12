@@ -11,6 +11,7 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\DB\Select;
 use Magento\Framework\Filesystem;
 use Magento\MediaStorage\Model\File\Uploader;
+use Sivaschenko\CleanMedia\Service\Deduplicator;
 use Sivaschenko\CleanMedia\Service\DuplicateFileFinder;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,6 +21,10 @@ use Magento\Catalog\Model\ResourceModel\Product\Gallery;
 use Magento\Framework\Filesystem\Driver\File;
 use Symfony\Component\Console\Input\InputOption;
 
+/**
+ * Class CatalogMedia
+ * @package Sivaschenko\CleanMedia\Command
+ */
 class CatalogMedia extends Command
 {
     /**
@@ -69,6 +74,8 @@ class CatalogMedia extends Command
      * @var File
      */
     private $file;
+    /** @var Deduplicator */
+    private $deduplicator;
 
     /**
      * Constructor
@@ -90,6 +97,15 @@ class CatalogMedia extends Command
         $this->filesystem = $filesystem;
         $this->duplicateFileFinder = $duplicateFileFinder;
         parent::__construct();
+        $this->deduplicator = new Deduplicator($this);
+    }
+
+    /**
+     * @return ResourceConnection
+     */
+    public function getResource(): ResourceConnection
+    {
+        return $this->resource;
     }
 
     /**
@@ -191,46 +207,18 @@ class CatalogMedia extends Command
 
         $duplicatedFiles = [];
         if ($input->getOption(self::INPUT_KEY_LIST_DUPES)) {
-            $resultVarchar = 0;
-            $resultGallery = 0;
-            $unlinked = 0;
-            $bytesFreed = 0;
             $duplicateSets = $this->duplicateFileFinder->addPath($this->getProductMediaPath())->findDuplicates()->getDuplicateSets();
 
-            foreach ($duplicateSets as $duplicateSet) {
-                $originalFullPath = array_shift($duplicateSet);
-                foreach($duplicateSet as $duplicateFullPath) {
-                    $originalDispersed = Uploader::getDispersionPath(basename($originalFullPath)) . DIRECTORY_SEPARATOR . basename($originalFullPath);
-                    $duplicateDispersed = Uploader::getDispersionPath(basename($duplicateFullPath)) . DIRECTORY_SEPARATOR . basename($duplicateFullPath);
+            try {
+                $this->deduplicator->deduplicateSets($duplicateSets, $this->resource, $output);
 
-                    if(file_exists($originalFullPath) && file_exists($duplicateFullPath)) {
-                        $db->beginTransaction();
-                        $resultVarchar += $db->update($this->resource->getTableName('catalog_product_entity_varchar'), ['value' => $originalDispersed], $db->quoteInto('value = ?', $originalDispersed));
-                        $resultGallery += $db->update($this->resource->getTableName('catalog_product_entity_media_gallery'), ['value' => $originalDispersed], $db->quoteInto('value = ?', $duplicateDispersed));
-                        $db->commit();
-
-                        $output->writeln('Replaced ' . $duplicateDispersed . ' with ' . $originalDispersed . ' (' . $resultVarchar . '/' . $resultGallery . ')');
-                        $bytesFreed += filesize($duplicateFullPath);
-                        unlink($duplicateFullPath);
-                        $unlinked++;
-                        if(file_exists($duplicateFullPath)) {
-                            throw new \Exception('File ' . $duplicateFullPath . ' not deleted; permissions issue?');
-                        }
-                    } else {
-                        if(!file_exists($duplicateFullPath)) {
-                            $output->writeln('Duplicate file ' . $duplicateFullPath . ' does not exist.');
-                        }
-                        if(!file_exists($originalFullPath)) {
-                            $output->writeln('Original file ' . $originalFullPath . ' does not exist.');
-                        }
-                    }
-                }
+                $output->writeln($this->deduplicator->getUnlinked() . ' duplicated files have been deleted');
+                $output->writeln($this->deduplicator->getResultVarchar() . ' rows have been updated in the catalog_product_entity_varchar table');
+                $output->writeln($this->deduplicator->getResultGallery() . ' rows have been updated in the catalog_product_entity_media_gallery table');
+                $output->writeln(round($this->deduplicator->getBytesFreed() / 1024 / 1024) . ' Mb has been freed.');
+            } catch (\Exception $e) {
+                $output->write('Could not deduplicate sets; ' . $e->getMessage());
             }
-
-            $output->writeln($unlinked . ' duplicated files have been deleted');
-            $output->writeln($resultVarchar . ' rows have been updated in the catalog_product_entity_varchar table');
-            $output->writeln($resultGallery . ' rows have been updated in the catalog_product_entity_media_gallery table');
-            $output->writeln(round($bytesFreed / 1024 / 1024) . ' Mb has been freed.');
         }
 
         $output->writeln(sprintf('Media Gallery entries: %s.', count($mediaGalleryPaths)));
