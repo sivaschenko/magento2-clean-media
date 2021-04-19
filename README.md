@@ -65,3 +65,15 @@ Missing files: 4.
 bin/magento si:catalog:media -r
 ```
 
+## List duplicates
+
+```
+bin/magento si:catalog-media:duplicates
+```
+
+## Remove/replace duplicates
+
+```
+bin/magento si:catalog-media:duplicates -r
+```
+

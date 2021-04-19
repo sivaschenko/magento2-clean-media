@@ -1,35 +1,42 @@
 <?php
 
-namespace Sivaschenko\CleanMedia\Service;
+namespace Sivaschenko\CleanMedia\Model;
 
 use Magento\MediaStorage\Model\File\Uploader;
 use Symfony\Component\Console\Output\OutputInterface;
 use Magento\Framework\App\ResourceConnection;
 
-/**
- * Class Deduplicator
- * @package Sivaschenko\CleanMedia\Service
- */
-class Deduplicator
+class RemoveDuplicates
 {
-    protected $resultVarchar = 0;
-    protected $resultGallery = 0;
-    protected $unlinked = 0;
-    protected $bytesFreed = 0;
+    /**
+     * @var ResourceConnection
+     */
+    private $resource;
+
+    /**
+     * @param ResourceConnection $resource
+     */
+    public function __construct(
+        ResourceConnection $resource
+    ) {
+        $this->resource = $resource;
+    }
 
     /**
      * @param array $duplicateSets
-     * @param ResourceConnection $resource
      * @param OutputInterface $output
-     * @return null
      * @throws \Exception
      */
-    public function deduplicateSets(
+    public function execute(
         array $duplicateSets,
-        ResourceConnection $resource,
         OutputInterface $output
     ) {
-        $db = $resource->getConnection();
+        $errors = [];
+        $resultVarchar = 0;
+        $resultGallery = 0;
+        $unlinked = 0;
+        $bytesFreed = 0;
+        $db = $this->resource->getConnection();
 
         foreach ($duplicateSets as $duplicateSet) {
             $originalFullPath = array_shift($duplicateSet);
@@ -39,60 +46,35 @@ class Deduplicator
 
                 if (file_exists($originalFullPath) && file_exists($duplicateFullPath)) {
                     $db->beginTransaction();
-                    $this->resultVarchar += $db->update($resource->getTableName('catalog_product_entity_varchar'),
+                    $resultVarchar += $db->update($this->resource->getTableName('catalog_product_entity_varchar'),
                         ['value' => $originalDispersed], $db->quoteInto('value = ?', $originalDispersed));
-                    $this->resultGallery += $db->update($resource->getTableName('catalog_product_entity_media_gallery'),
+                    $resultGallery += $db->update($this->resource->getTableName('catalog_product_entity_media_gallery'),
                         ['value' => $originalDispersed], $db->quoteInto('value = ?', $duplicateDispersed));
                     $db->commit();
 
                     $output->writeln('Replaced ' . $duplicateDispersed . ' with ' . $originalDispersed . ' (' . $resultVarchar . '/' . $resultGallery . ')');
-                    $this->bytesFreed += filesize($duplicateFullPath);
+                    $bytesFreed += filesize($duplicateFullPath);
                     unlink($duplicateFullPath);
-                    $this->unlinked++;
+                    $unlinked++;
                     if (file_exists($duplicateFullPath)) {
-                        throw new \Exception('File ' . $duplicateFullPath . ' not deleted; permissions issue?');
+                        $errors[] = 'File ' . $duplicateFullPath . ' not deleted; permissions issue?';
                     }
                 } else {
                     if (!file_exists($duplicateFullPath)) {
-                        $output->writeln('Duplicate file ' . $duplicateFullPath . ' does not exist.');
+                        $errors[] = 'Duplicate file ' . $duplicateFullPath . ' does not exist.';
                     }
                     if (!file_exists($originalFullPath)) {
-                        $output->writeln('Original file ' . $originalFullPath . ' does not exist.');
+                        $errors[] = 'Original file ' . $originalFullPath . ' does not exist.';
                     }
                 }
             }
         }
-    }
-
-    /**
-     * @return int
-     */
-    public function getResultVarchar(): int
-    {
-        return $this->resultVarchar;
-    }
-
-    /**
-     * @return int
-     */
-    public function getResultGallery(): int
-    {
-        return $this->resultGallery;
-    }
-
-    /**
-     * @return int
-     */
-    public function getUnlinked(): int
-    {
-        return $this->unlinked;
-    }
-
-    /**
-     * @return int
-     */
-    public function getBytesFreed(): int
-    {
-        return $this->bytesFreed;
+        return [
+            'varchar' => $resultVarchar,
+            'gallery' => $resultGallery,
+            'unlinked' => $unlinked,
+            'bytes' => $bytesFreed,
+            'errors' => $errors
+        ];
     }
 }
