@@ -129,15 +129,3 @@ Updated catalog_product_entity_media_gallery rows: 1
 Disk space freed: 1 Mb
 ```
 
-## List duplicates
-
-```
-bin/magento si:catalog-media:duplicates
-```
-
-## Remove/replace duplicates
-
-```
-bin/magento si:catalog-media:duplicates -r
-```
-

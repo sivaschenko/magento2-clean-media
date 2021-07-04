@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Sivaschenko\CleanMedia\Command;
 
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\Console\Cli;
 use Magento\Framework\DB\Select;
 use Magento\Framework\Filesystem;
 use Symfony\Component\Console\Command\Command;
@@ -123,11 +124,16 @@ class CatalogMedia extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $mediaGalleryPaths = $this->getMediaGalleryPaths();
+        $productMediaPath = $this->getProductMediaPath();
+        if (!is_dir($productMediaPath)) {
+            $output->writeln(sprintf('Cannot find "%s" folder.', $productMediaPath));
+            $output->writeln('It appears there are no product images to analyze.');
+            return Cli::RETURN_FAILURE;
+        }
 
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator(
-                $this->getProductMediaPath(),
+                $productMediaPath,
                 \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS
             )
         );
@@ -143,6 +149,8 @@ class CatalogMedia extends Command
         $removedRows = 0;
         $updatedVarcharRows = 0;
         $updatedGalleryRows = 0;
+
+        $mediaGalleryPaths = $this->getMediaGalleryPaths();
 
         /** @var $info \SplFileInfo */
         foreach ($iterator as $info) {
@@ -220,6 +228,7 @@ class CatalogMedia extends Command
         if ($input->getOption(self::INPUT_KEY_REMOVE_UNUSED) || $input->getOption(self::INPUT_KEY_REMOVE_DUPES)) {
             $output->writeln(sprintf('Disk space freed: %s Mb', round($bytesFreed / 1024 / 1024)));
         }
+        return Cli::RETURN_SUCCESS;
     }
 
     /**
