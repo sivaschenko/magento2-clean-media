@@ -56,6 +56,11 @@ class CatalogMedia extends Command
     const INPUT_KEY_REMOVE_DUPES = 'remove_dupes';
 
     /**
+     * Ignore these folders located in catalog product folder
+     */
+    const IGNORE_FOLDERS = ['watermark', 'placeholder'];
+
+    /**
      * @var Filesystem
      */
     public $filesystem;
@@ -131,10 +136,17 @@ class CatalogMedia extends Command
             return Cli::RETURN_FAILURE;
         }
 
+        $filter = self::IGNORE_FOLDERS;
+
         $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator(
-                $productMediaPath,
-                \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS
+            new \RecursiveCallbackFilterIterator(
+                new \RecursiveDirectoryIterator(
+                    $productMediaPath,
+                    \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS,
+                ),
+                function ($fileInfo, $key, $iterator) use ($filter) {
+                    return !in_array(basename($fileInfo->getBasename()),$filter);
+                }
             )
         );
 

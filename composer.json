@@ -2,7 +2,7 @@
   "name": "sivaschenko/magento2-clean-media",
   "description": "Magento 2 media analysis and cleanup",
   "type": "magento2-module",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "license": "MIT",
   "authors": [
     {
