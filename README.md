@@ -8,7 +8,7 @@ You can use this form, and install via composer:
 1. composer config repositories.github.repo.repman.io composer https://github.repo.repman.io
 2. composer require sivaschenko/magento2-clean-media
 
-   
+I will maintain this as I need to for self usage.    
 
 ```
 bin/magento si:catalog:media
