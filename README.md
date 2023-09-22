@@ -1,6 +1,14 @@
 # Overview
 
 The module provides a command for retrieving information about catalog media files.
+The original source github repo seems to have been abandoned.
+
+You can use this form, and install via composer:
+
+1. composer config repositories.github.repo.repman.io composer https://github.repo.repman.io
+2. composer require sivaschenko/magento2-clean-media
+
+   
 
 ```
 bin/magento si:catalog:media
