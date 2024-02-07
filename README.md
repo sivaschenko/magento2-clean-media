@@ -1,6 +1,7 @@
 # Overview
 
-Refer to: https://github.com/baldwin-agency/magento2-module-image-cleanup which is a more active project doing more / similar work
+Refer to: https://github.com/baldwin-agency/magento2-module-image-cleanup which is a more active project doing more / similar work.
+
 I'd say, use that instead :)
 
 The module provides a command for retrieving information about catalog media files.
